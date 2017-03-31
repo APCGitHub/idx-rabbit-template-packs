@@ -1,0 +1,43 @@
+{% if listings is defined and listings | length %}
+	<style>
+		.list-container .list-item {
+			padding-top: 7px;
+			padding-bottom: 7px;
+			margin-bottom: 15px;
+		}
+
+		.list-item {
+			border: 1px solid #cfcfcf;
+		}
+
+		.list-item ul {
+			list-style-type: none;
+		}
+
+		.list-item p {
+			margin-bottom: 0;
+		}
+
+		.list-item .right {
+			vertical-align: top;
+			display: inline-block;
+		}
+
+		.list-item .left {
+			vertical-align: top;
+			display: inline-block;
+		}
+
+		.list-item .address {
+			font-size: 1.2em;
+		}
+	</style>
+
+	{% for listing in listings %}
+		<div class="row list-container">
+			<div class="col-sm-12">
+				{% include "listings/list_item.html" with {listing: listing} %}
+			</div>
+		</div>
+	{% endfor %}
+{% endif %}

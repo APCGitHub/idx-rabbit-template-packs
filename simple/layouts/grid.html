@@ -1,0 +1,50 @@
+{% import "macros/errors.html" as Error %}
+
+<style>
+	.grid-item .top {
+		position: relative;
+	}
+
+	.grid-item .top .listing-data {
+		position: absolute;
+		top: 0;
+		height: 40px;
+		left: 0;
+		right: 0;
+		line-height: 40px;
+		z-index: 999;
+	}
+
+	.grid-item .top .listing-data .price {
+		font-size: 1.6em;
+		margin-right: 10px;
+		padding-left: 5px;
+		font-weight: bold;
+	}
+
+	.grid-item .top .listing-data span {
+		text-shadow: 0 0 1px black;
+		color: white;
+	}
+</style>
+
+{% if listings is defined and listings | length %}
+	{% for row in listings|batch(3) %}
+		<div class="row">
+			{% for listing in row %}
+				<div class="col-sm-4">
+					{% include "listings/grid_item.html" with {listing: listing} %}
+				</div>
+				{% if loop.index % 3 == 0 %}
+					<div class="clear-fix visible-sm visible-md visible-lg"></div>
+				{% endif %}
+			{% endfor %}
+		</div>
+	{% endfor %}
+{% else %}
+	<div class="row">
+		<div class="col-sm-12 col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3">
+			{{Error.general("No listings found.")}}
+		</div>
+	</div>
+{% endif %}

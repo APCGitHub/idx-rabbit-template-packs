@@ -1,0 +1,399 @@
+{% import "macros/listings.html" as Listings %}
+{% import "macros/errors.html" as Errors %}
+
+{% set result = listing(listing_id) %}
+{% set hasPhotos = false %}
+
+{% set actions = [] %}
+
+{% if on_load is defined %}
+	{% set actions = on_load | split(',') %}
+{% endif %}
+
+<style>
+	.panel .panel-heading h4 {
+		margin: 0 !important;
+	}
+
+	.container > .row:first-child {
+		margin-top: 30px;
+	}
+
+	#property-detail-map {
+		width: 100%;
+		height: 400px;
+	}
+
+	.alert {
+		margin-bottom: 0 !important;
+	}
+
+	.swiper-slide {
+		text-align: center;
+	}
+</style>
+
+<div class="container">
+	<div class="row">
+		<div class="col-sm-12 col-md-10 col-md-offset-1">
+			{% if result.data is defined %}
+				{% set listing = result.data %}
+
+				{% if listing.listing is defined and listing.listing.photos is defined and listing.listing.photos | length %}
+					{% set hasPhotos = true %}
+				{% endif %}
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h4>
+							<strong>{{ Listings.fullAddress(listing) }}</strong>
+							<small class="text-muted pull-right">
+								Listing# {{listing.ListingId}}
+							</small>
+						</h4>
+					</div>
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-sm-12">
+								<strong>Price:</strong> ${{ listing.ListPrice | number_format(0) }}
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-4">
+								<div><strong>Bedrooms:</strong> {{ listing.BedroomsTotal }}</div>
+								<div><strong>Full Bathrooms:</strong> {{ listing.BathroomsFull }}</div>
+								<div><strong>Partial Bathrooms:</strong> {{ listing.BathroomsPartial }}</div>
+							</div>
+							<div class="col-sm-4">
+								<div><strong>Sq. Feet:</strong> {{ listing.LotSizeSquareFeet | number_format(0) }}</div>
+								<div><strong>Type:</strong> {{ listing.PropertyType }}</div>
+							</div>
+							<div class="col-sm-4">
+								<div><strong>School District:</strong> {{listing.HighSchoolDistrict}}</div>
+								<div><strong>County:</strong> {{listing.CountyOrParish}}</div>
+							</div>
+						</div>
+						<div class="row" style="margin-top:10px">
+							<div class="col-sm-4">
+								{% if not likedListing(listing.ListingId) %}
+									{{ favListingForm({
+										listingId: listing.ListingId
+									}) }}
+										<input type="hidden" name="provider" value="facebook">
+										<button class="btn btn-default" id="favorite-button"><i class="fa fa-star-o"></i>&nbsp;Favorite</button>
+									{{ formClose() }}
+
+									<button type="button" id="favorite-success-button" class="btn btn-success hidden" disabled><i class="fa fa-star"></i>&nbsp;Favorited</button>
+								{% else %}
+									<button type="button" class="btn btn-success" disabled><i class="fa fa-star"></i>&nbsp;Favorited</button>
+								{% endif %}
+							</div>
+						</div>
+						{% if hasPhotos %}
+						<div class="row" style="margin-top: 20px">
+							<div class="col-sm-12 col-md-10 col-md-offset-1">
+								{% set photo = listing.listing.photos[0] %}
+
+								{% set _url = cloudinary(photo.url, {
+									width: 1000,
+									height: 550,
+									transform: 'fit'
+								}) %}
+								
+								<img src="{{_url}}">
+							</div>
+						</div>
+						{% endif %}
+						<div class="row" style="margin-top: 15px">
+							<div class="col-sm-12 text-center">
+								<button class="btn btn-success" data-toggle="modal" data-target="#leadModal-{{listing.ListingId}}">
+									Have a Question?
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong>Map</strong>
+					</div>
+					<div class="panel-body">
+						{% if listing.Latitude and listing.Longitude %}
+							<div id="property-detail-map" data-lat="{{listing.Latitude}}" data-lng="{{listing.Longitude}}"></div>
+						{% else %}
+							{{Errors.general("No map information available.")}}
+						{% endif %}
+					</div>
+				</div>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong>Remarks</strong>
+					</div>
+					<div class="panel-body">
+						{% if listing.PublicRemarks %}
+							{{listing.PublicRemarks}}
+						{% else %}
+							{{Errors.general("No remarks available.")}}
+						{% endif %}
+					</div>
+				</div>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong>Overview</strong>
+					</div>
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Property Type:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.PropertyType}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Listing Status:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.StandardStatus}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>MLS Major Area:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.MLSAreaMajor}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>MLS Minor Area:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.MLSAreaMinor}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Subdivision:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.SubdivisionName}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Style:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.ArchitecturalStyle}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Year Built:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.YearBuilt}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Construction Materials:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.ConstructionMaterials}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Foundation:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.FoundationDetails}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Square Feet:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.LotSizeSquareFeet | number_format(0)}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Acres:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.LotSizeArea}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Stories:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.Stories}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Roofing:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.Roof}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Garage Description:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.ParkingFeatures}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Garage Spaces:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.GarageSpaces}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Heating:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.Heating}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Utilities:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.Utilities}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Lot Features:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.LotFeatures}}</div>
+						</div>
+					</div>
+				</div>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong>Features</strong>
+					</div>
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Exterior Features:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.ExteriorFeatures}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Interior Features:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.InteriorFeatures}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Other Equipment:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.OtherEquipment}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Fireplace Features:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.FireplaceFeatures}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Fireplaces Total:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.FireplacesTotal}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Pool Features:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.PoolFeatures}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Flooring:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.Flooring}}</div>
+						</div>
+					</div>
+				</div>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong>Room Info</strong>
+					</div>
+					<div class="panel-body">
+						{% if listing.rooms is defined %}
+							<div class="row">
+								<div class="col-sm-4 col-md-3"><b>Room</b></div>
+								<div class="col-sm-1 col-md-1"><b>Level</b></div>
+								<div class="col-sm-1 col-md-1"><b>Approx. Size</b></div>
+								<div class="col-sm-6 col-md-7"><b>Description</b></div>
+							</div>
+							{% for room in listing.rooms %}
+								<div class="row">
+									<div class="col-sm-4 col-md-3">{{room.RoomType}}</div>
+									<div class="col-sm-1 col-md-1">{{room.Level}}</div>
+									<div class="col-sm-1 col-md-1">{{room.Dimensions}}</div>
+									<div class="col-sm-6 col-md-7">{{room.Description}}</div>
+								</div>
+							{% endfor %}
+						{% else %}
+							{{Errors.general("No room information available.")}}
+						{% endif %}
+					</div>
+				</div>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong>Schools</strong>
+					</div>
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>School District:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.HighSchoolDistrict}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Elementary School:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.ElementarySchoolDistrict}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Middle School:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.MiddleSchoolDistrict}}</div>
+						</div>
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>High School:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.HighSchoolDistrict}}</div>
+						</div>
+					</div>
+				</div>
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<strong>Financial</strong>
+					</div>
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-xs-6 col-sm-4 col-md-3"><strong>ListingPrice:</strong></div>
+							<div class="col-xs-6 col-sm-8 col-md-9">${{listing.ListPrice | number_format(0)}}</div>
+						</div>
+					</div>
+				</div>
+				{% if false %}
+				<div class="panel panel-default">
+					<div class="panel-body">
+						{{dump(listing)}}
+					</div>
+				</div>
+				{% endif %}
+			{% else %}
+				{{Errors.api(result)}}
+			{% endif %}
+		</div>
+	</div>
+
+	{% if hasPhotos %}
+		{% include "modals/slideshow.html" %}
+	{% endif %}
+
+	{% include "modals/lead.html" with {key: listing.ListingId} %}
+</div>
+
+{% if hasPhotos %}
+	<script>
+		var main = new Swiper('#swiper-{{listing.ListingId}}', {
+		    spaceBetween: 20,
+		    nextButton: '#swiper-next-{{listing.ListingId}}',
+		    prevButton: '#swiper-prev-{{listing.ListingId}}',
+		    slidesPerView: 1,
+        	centeredSlides: true,
+		    autoHeight: true
+		});
+
+		setTimeout(function () {
+			main.update(true);
+		}, 1000); 
+
+		var thumb = new Swiper('#swiper-{{listing.ListingId}}-thumbs', {
+		    speed: 400,
+		    spaceBetween: 20,
+		    nextButton: '#swiper-next-{{listing.ListingId}}-thumbs',
+		    prevButton: '#swiper-prev-{{listing.ListingId}}-thumbs',
+		    slidesPerView: 7
+		});
+
+		thumb.on('click', function (e) {
+			main.slideTo(e.clickedIndex);
+		});
+
+		{% if actions|length %}
+
+		(function ($) {
+			$(document).ready(function () {
+				{% if 'favorite_listing' in actions and hasSocial() and not likedListing(listing.ListingId) %}
+					var $favb = $('#favorite-button');
+					var $favb_success = $('#favorite-success-button');
+
+					$favb.find('i').removeClass('fa-star-o').addClass('fa-spin').addClass('fa-spinner');
+
+
+					$.ajax({
+						url: '/wp-admin/admin-ajax.php',
+						type: 'POST',
+						data: {
+							listing_id: '{{listing.ListingId}}',
+							listing_url: '{{url}}',
+							action: 'post_favorite_listing'
+						},
+						success: function (res) {
+							console.log(res);
+
+							if(res.success) {
+								$favb.hide();
+								$favb_success.removeClass('hidden');
+							} else {
+								$favb.find('i').addClass('fa-star-o').removeClass('fa-spin').removeClass('fa-spinner');
+							}
+						},
+						error: function (err) {
+							console.log(err);
+							$favb.find('i').addClass('fa-star-o').removeClass('fa-spin').removeClass('fa-spinner');
+						}
+					});
+				{% endif %}
+			});
+		})(jQuery);
+
+		{% endif %}
+	</script>
+{% endif %}

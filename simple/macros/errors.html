@@ -1,0 +1,22 @@
+{% macro api(blob) %}
+	<div class="alert alert-info">
+		<h3 class="text-center">Uh oh...</h3>
+		<div>
+			{% if blob['errors'] is defined and blob['errors'] is not null %}
+				{% for error in blob.errors %}
+					<p>{{error.message}}</p>
+				{% endfor %}
+			{% elseif blob['error'] is defined and blob['error'] is not null %}
+				<p>{{blob.error.message}}</p>
+			{% else %}
+				<p>An unknown error occurred!</p>
+			{% endif %}
+		</div>
+	</div>
+{% endmacro %}
+
+{% macro general(message) %}
+	<div class="alert alert-info text-center">
+		<strong>{{message}}</strong>
+	</div>
+{% endmacro %}

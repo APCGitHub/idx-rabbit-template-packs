@@ -1,0 +1,195 @@
+{% import "macros/errors.html" as Error %}
+
+{% set params = {
+	'$top': (per_page is defined and per_page) ? per_page : 12,
+} %}
+
+{% if skip is defined and skip %}
+	{% set params = params|merge({
+		'$skip': params['$top'] * skip
+	}) %}
+{% endif %}
+
+{#
+# Assume that orderby is in the form {Param-order}
+# so we split on `-` to get the two desired args
+#}
+
+{% if orderby is defined and orderby %}
+	{% set _orderby = orderby|split('-') %}
+	{% if _orderby|length == 2 %}
+		{% set _orderby = _orderby[0] ~ ' ' ~ _orderby[1] %}
+	{% endif %}
+
+	{% set params = params|merge({
+		'$orderby': _orderby
+	}) %}
+{% endif %}
+
+{% set perPageOptions = [12, 24, 36] %}
+
+{% set orderbyOptions = [
+	{
+		label: 'Sort Order',
+		value: ''
+	},
+	{
+		label: 'Price Descending',
+		value: 'ListPrice-desc'
+	},
+	{
+		label: 'Price Ascending',
+		value: 'ListPrice-asc'
+	}
+] %}
+
+{# Perform the search with the search_id and params #}
+
+{% set results = search(search_id, params) %}
+
+<style>
+	input[type=checkbox] {
+		-webkit-appearance: checkbox;
+		-moz-appearance: checkbox;
+		appearance: checkbox;
+	}
+
+	select {
+		-webkit-appearance: menulist !important;
+		-moz-appearance: menulist !important;
+		appearance: menulist !important;
+	}
+
+	.layout-change {
+		cursor: pointer;
+	}
+</style>
+
+<div class="container">
+	<div class="row" style="margin-top: 30px">
+		<div class="col-sm-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
+			<div class="row" style="margin-bottom: 15px">
+				<div class="col-sm-4">
+					<select class="form-control" id="results-order">
+						{% for option in orderbyOptions %}
+							<option value="{{option.value}}" {% if option.value == orderby %}selected{% endif %}>{{option.label}}</option>
+						{% endfor %}
+					</select>
+				</div>
+				<div class="col-sm-4"></div>
+				<div class="col-sm-4">
+					Show <select id="results-per-page" style="display:inline; margin-right: 10px">
+							{% for page in perPageOptions %}
+								<option value="{{page}}" {% if per_page is defined and per_page == page %}selected{% endif %}>{{ page }}</option>
+							{% endfor %}
+						</select>
+
+					{% if layout is defined and layout == "grid" %}
+						<span class="layout-change" data-layout="list">List View</span>
+					{% else %}
+						<span class="layout-change" data-layout="grid">Grid View</span>
+					{% endif %}
+				</div>
+			</div>
+			{% if results.data is defined %}
+				{% if layout is defined and layout == "grid" %}
+					{% include "layouts/grid.html" with {listings: results.data} %}
+				{% else %}
+					{% include "layouts/list.html" with {listings: results.data} %}
+				{% endif %}
+			{% else %}
+				<div class="row">
+					<div class="col-sm-12 col-md-6 col-md-offset-3">
+						{{ Error.api(results) }}
+					</div>
+				</div>
+			{% endif %}
+
+			{% if results.data is defined %}
+			<div class="row" style="margin-bottom: 15px">
+				<div class="col-sm-6">
+					{% if skip is defined and skip > 0 %}
+					<button data-skip="{{skip-1}}" class="paginator btn btn-default"><i class="fa fa-chevron-left"></i>&nbsp;Prev</button>
+					{% endif %}
+				</div>
+				<div class="col-sm-6">
+					{% if (results.data | length) == params['$top'] %}
+					<button data-skip="{{skip+1}}" class="paginator btn btn-default pull-right">Next&nbsp;<i class="fa fa-chevron-right"></i></button>
+					{% endif %}
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+</div>
+
+<script>
+	(function ($) {
+		var skip = {{skip is defined and skip ? skip : 0}};
+		var perPage = {{per_page ?: 12}};
+		var layout = "{{layout}}";
+		var searchId = {{search_id ?: 0}};
+		var orderby = "{{orderby}}";
+		var current_page = "{{current_page}}";
+
+		$(document).ready(function () {
+			$('#results-per-page').on('change', function () {
+				var pp = getParameterByName('per_page');
+				var url = "";
+				
+				if(pp == null) {
+					url = window.location.href;
+					url += '&per_page=' + $(this).val();
+				} else {
+					perPage = $(this).val();
+					url = buildUrl();
+				}
+
+				window.location = url;
+			});
+
+			$('.layout-change').click(function () {
+				var t = $(this);
+				var l = t.data('layout');
+
+				layout = l;
+
+				window.location = buildUrl();
+			});
+
+			$('#results-order').change(function () {
+				orderby = $(this).val();
+				window.location = buildUrl();
+			});
+
+			$('.paginator').click(function () {
+				skip = $(this).data('skip');
+				window.location = buildUrl();
+			});
+		});
+
+		function buildUrl() {
+			var url = current_page + '?';
+
+			url += "search_id=" + searchId;
+			url += "&layout=" + layout;
+			url += "&skip=" + skip;
+			url += "&per_page=" + perPage;
+			url += "&orderby=" + orderby;
+
+			return url;
+		}
+
+		function getParameterByName(name, url) {
+		    if (!url) {
+		      url = window.location.href;
+		    }
+		    name = name.replace(/[\[\]]/g, "\\$&");
+		    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+		        results = regex.exec(url);
+		    if (!results) return null;
+		    if (!results[2]) return '';
+		    return decodeURIComponent(results[2].replace(/\+/g, " "));
+		}
+	})(jQuery);
+</script>

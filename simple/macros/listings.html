@@ -1,0 +1,21 @@
+{% macro address(listing) %}
+	{%- if listing is not null %}
+		{{- listing.StreetNumberNumeric -}}&nbsp;{{- listing.StreetName -}}{% if listing.StreetSuffix %}&nbsp;{{- listing.StreetSuffix -}}{% endif -%}
+	{% endif -%}
+{% endmacro %}
+
+{% macro fullAddress(listing, config) %}
+	{% import _self as listings %}
+
+	{% if listing is not null %}
+		<span>
+			{{ listings.address(listing) }},
+
+			{%- if config is defined and config.separated is defined and config.separated %}
+				<br>
+			{% endif -%}
+
+			&nbsp;{% if listing.City %}{{- listing.City -}},&nbsp;{% endif %}{{- listing.StateOrProvince -}}&nbsp;{{- listing.PostalCode -}}
+		</span>
+	{% endif %}
+{% endmacro %}

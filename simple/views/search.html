@@ -1,0 +1,419 @@
+{% import "@private/forms/search.html" as Form %}
+
+{% set priceRange = range(0, 800, 200) %}
+{% set priceRange = priceRange|merge(range(1000, 9000, 1000)) %}
+{% set priceRange = priceRange|merge(range(10000, 95000, 5000)) %}
+{% set priceRange = priceRange|merge(range(100000, 990000, 10000)) %}
+{% set priceRange = priceRange|merge(range(1000000, 10000000, 100000)) %}
+
+{% set priceRangeObject = [] %}
+
+{% for price in priceRange %}
+	{% set priceRangeObject = priceRangeObject|merge([{
+		value: price,
+		label: '$' ~ (price | number_format(0))
+	}])%}
+{% endfor %}
+
+{% set propertyTypes = [
+	{
+		label: '-- select --',
+		value: ''
+	},
+	{
+		label: 'Single Family',
+		value: ''	
+	}, 
+	{
+		label: 'Condo',
+		value: ''
+	},
+	{
+		label: 'Townhouse',
+		value: ''
+	},
+	{
+		label: 'Duplex',
+		value: ''
+	},
+	{
+		label: 'Half Duplex',
+		value: ''
+	},
+	{
+		label: 'Multi Family',
+		value: ''
+	},
+	{
+		label: 'Residential Lease',
+		value: ''
+	},
+	{
+		label: 'Lots/Acreage',
+		value: ''
+	},
+	{
+		label: 'Farm/Hobby',
+		value: ''
+	},
+	{
+		label: 'Commercial',
+		value: ''
+	},
+	{
+		label: 'Commercial Lease',
+		value: ''
+	}
+] %}
+
+{% set amenities = [
+	{
+		label: 'Fireplace',
+		value: 'FirePlace'
+	},
+	{
+		label: 'Pool',
+		value: 'Pool'
+	}, 
+	{
+		label: 'Water/Lake Front',
+		value: 'Water'
+	},
+	{
+		label: 'Water/Lake View',
+		value: 'Water'
+	},
+	{
+		label: 'Near Golf Course',
+		value: 'Golf'
+	},
+	{
+		label: 'Horses Permitted',
+		value: 'Horses'
+	},
+	{
+		label: 'Greenbelt',
+		value: 'Green'
+	},
+	{
+		label: 'One Story',
+		value: 'One'
+	},
+	{
+		label: 'Two Stories',
+		value: 'Two'
+	},
+	{
+		label: 'Three Stories',
+		value: 'Three'
+	}
+] %}
+
+{% set amenities = amenities|sort %}
+
+<style>
+	h4 {
+		margin: 0 !important;
+	}
+
+	input[type=checkbox] {
+		-webkit-appearance: checkbox;
+		-moz-appearance: checkbox;
+		appearance: checkbox;
+	}
+
+	select {
+		-webkit-appearance: menulist !important;
+		-moz-appearance: menulist !important;
+		appearance: menulist !important;
+	}
+</style>
+
+<div class="container">
+	<div class="row" style="margin-top:30px">
+		<div class="col-sm-12 col-md-10 col-md-offset-1">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4>Standard Search</h4>
+				</div>
+				<div class="panel-body">
+					{{ searchForm({
+						id: 'standard-search',
+						class: 'form-horizontal col-sm-12 col-md-10 col-md-offset-1',
+						redirect: redirect
+					}) }}
+						<div class="form-group">
+							<div class="col-sm-12 col-md-8 col-md-offset-2">
+								<label>Search by Street, City, State or Zip</label>
+								{{ Form.multiFieldText({
+									id: 'multi-field',
+									fields: ['City', 'StateOrProvince', 'PostalCode', 'StreetName'],
+									class: 'form-control',
+									placeholder: 'Search...'
+								}) }}
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-sm-8">
+								<h3 class="text-center">Property Features</h3>
+								<label>Price Range</label>
+								<div class="form-group">
+									{{ Form.selectBetween({
+										field: 'ListPrice',
+										wrapper: [
+											{tag: 'div', class: 'col-sm-6'},
+											{tag: 'div', class: 'col-sm-6'}
+										],
+										id: 'list-price',
+										class: ['form-control', 'form-control'],
+										options: [
+											[{label: '-- Min --', value: ''}]|merge(priceRangeObject), 
+											[{label: '-- Max --', value: ''}]|merge(priceRangeObject)
+										]
+									}) }}
+								</div>
+
+								<div class="form-group">
+									<div class="col-sm-6">
+										<label>Beds</label>
+										{{
+											Form.select({
+												field: 'BedroomsTotal',
+												id: 'bedrooms',
+												type: 'ge',
+												class: 'form-control',
+												options: [
+													{
+														label: 'No Minimum',
+														value: ''
+													},
+													{
+														label: '1 or more',
+														value: 1
+													},
+													{
+														label: '2 or more',
+														value: 2
+													},
+													{
+														label: '3 or more',
+														value: 3
+													},
+													{
+														label: '4 or more',
+														value: 4
+													},
+													{
+														label: '5 or more',
+														value: 5
+													},
+													{
+														label: '6 or more',
+														value: 6
+													},
+													{
+														label: '7 or more',
+														value: 7
+													}
+												]
+											})
+										}}
+									</div>
+									<div class="col-sm-6">
+										<label>Baths</label>
+										{{
+											Form.select({
+												field: 'BathroomsFull',
+												id: 'bathrooms',
+												type: 'ge',
+												class: 'form-control',
+												options: [
+													{
+														label: 'No Minimum',
+														value: ''
+													},
+													{
+														label: '1 or more',
+														value: 1
+													},
+													{
+														label: '2 or more',
+														value: 2
+													},
+													{
+														label: '3 or more',
+														value: 3
+													},
+													{
+														label: '4 or more',
+														value: 4
+													},
+													{
+														label: '5 or more',
+														value: 5
+													},
+													{
+														label: '6 or more',
+														value: 6
+													},
+													{
+														label: '7 or more',
+														value: 7
+													}
+												]
+											})
+										}}
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-sm-12">
+										<label>Listing Status</label>
+										{{ 
+											Form.select({
+												field: 'StandardStatus',
+												id: 'status',
+												class: 'form-control',
+												options: [
+													{
+														label: 'All',
+														value: ''
+													},
+													{
+														label: 'Active',
+														value: 'Active'
+													},
+													{
+														label: 'Active Contingent',
+														value: 'ActiveContingent'
+													},
+													{
+														label: 'Active Kick Out',
+														value: 'ActiveKickOut'
+													},
+													{
+														label: 'Active Option Contract',
+														value: 'ActiveOptionContract'
+													}
+												]
+											})
+										}}
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-sm-6">
+										<label>Min Sq. Feet</label>
+										{{ Form.select({
+											field: 'LotSizeArea',
+											id: 'square-footage',
+											class: 'form-control',
+											options: [{label: 'No Minimum', value: ''}] | merge(range(0, 15000, 200))
+										}) }}
+									</div>
+									<div class="col-sm-6">
+										<label>Acreage</label>
+										{{ Form.select({
+											field: 'LotSizeAcres',
+											id: 'acres',
+											class: 'form-control',
+											options: [{label: 'No Minimum', value: ''}] | merge(range(1, 10))
+										}) }}
+									</div>
+								</div>
+
+								<div class="form-group">
+									<div class="col-sm-12">
+										<label>Garage/Carport</label>
+										{{ Form.select({
+											field: 'LotSizeAcres',
+											id: 'acres',
+											class: 'form-control',
+											options: [
+												{
+													label: 'No Minimum',
+													value: ''
+												},
+												{
+													label: '1 or more',
+													value: 1
+												},
+												{
+													label: '2 or more',
+													value: 2
+												},
+												{
+													label: '3 or more',
+													value: 3
+												},
+												{
+													label: '4 or more',
+													value: 4
+												},
+												{
+													label: '5 or more',
+													value: 5
+												},
+												{
+													label: '6 or more',
+													value: 6
+												},
+												{
+													label: '7 or more',
+													value: 7
+												}
+											]
+										}) }}
+									</div>
+								</div>
+
+								<div class="form-group">
+									<h3 class="text-center">Amenities</h3>
+									{{ Form.checkboxGroup({
+										field: 'ExteriorFeatures',
+										id: 'amenities',
+										type: 'contains',
+										class: 'checkbox',
+										options: amenities,
+										wrapper: {tag: 'label', class: 'col-xs-6 col-sm-6 col-md-4'}
+									}) }}
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<h3 class="text-center">Lifestyle</h3>
+								<div class="form-group">
+									<label>Highly Rated Schools</label>
+									<select class="form-control"></select>
+								</div>
+								<div class="form-group">
+									<label>Low Crime Ratings</label>
+									<select class="form-control"></select>
+								</div>
+								<div class="form-group">
+									<label>Median Home Income</label>
+									<select class="form-control"></select>
+								</div>
+								<div class="form-group">
+									<label>Type of Neighborhood</label>
+									<select class="form-control"></select>
+								</div>
+								<div class="form-group">
+									<label>Cost of Living</label>
+									<select class="form-control"></select>
+								</div>
+								<div class="form-group">
+									<label>Commute Time</label>
+									<select class="form-control"></select>
+								</div>
+							</div>
+						</div>
+						<div class="form-group text-center" style="margin-top: 15px">
+							<button class="btn btn-success">Search Results</button>
+						</div>
+					{{ formClose() }}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

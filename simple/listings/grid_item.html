@@ -1,0 +1,58 @@
+{% import "macros/listings.html" as Listings %}
+
+{% if listing is defined %}
+	{% set hasPhotos = false %}
+	{% set photo = {url: 'http://placehold.it/120x120'} %}
+
+	{% if listing.listing is defined and listing.listing.photos is defined and listing.listing.photos | length %}
+		{% set hasPhotos = true %}
+	{% endif %}
+
+	<div class="grid-item">
+		<div class="top">
+			{% if hasPhotos %}
+				<div class="swiper-container" id="swiper-{{listing.ListingId}}">
+					<div class="swiper-wrapper">
+						{% for photo in listing.listing.photos %}
+							{% set url = cloudinary(photo.url, {
+								width: 500,
+								height: 350,
+								transform: 'fill'
+							}) %}
+							<div class="swiper-slide">
+								<a href="/property-details/{{listing.ListingId}}">
+									<img class="img-responsive" src="{{url}}">
+								</a>
+							</div>
+						{% endfor %}
+					</div>
+					<div class="swiper-button-prev" id="swiper-prev-{{listing.ListingId}}"></div>
+    				<div class="swiper-button-next" id="swiper-next-{{listing.ListingId}}"></div>
+				</div>
+
+				<script>
+					var mySwiper = new Swiper('#swiper-{{listing.ListingId}}', {
+					    speed: 400,
+					    spaceBetween: 20,
+					    nextButton: '#swiper-next-{{listing.ListingId}}',
+					    prevButton: '#swiper-prev-{{listing.ListingId}}',
+					    autoHeight: true,
+					    loop: true
+					});
+					setTimeout(function () {
+						mySwiper.update(true);
+					}, 500);   
+				</script>
+			{% else %}
+				<img class="img-responsive" src="{{photo.url}}">
+			{% endif %}
+			<div class="listing-data">
+				<span class="price">${{ listing.ListPrice | number_format(0) }}</span>
+				<span>{{listing.BedroomsTotal}} Beds / {{listing.BathroomsFull}} Baths</span>
+			</div>
+		</div>
+		<div class="bottom">
+			<p>{{Listings.fullAddress(listing, {separated: true})}}</p>
+		</div>
+	</div>
+{% endif %}

@@ -1,0 +1,56 @@
+{% import "macros/listings.html" as Listings %}
+
+{% if listing is defined %}
+	{% set hasPhotos = false %}
+	{% set photo = {url: 'http://placehold.it/120x120'} %}
+
+	{% if listing.listing is defined and listing.listing.photos is defined and listing.listing.photos | length %}
+		{% set hasPhotos = true %}
+	{% endif %}
+
+	<div class="row list-item">
+		<div class="col-sm-6">
+			<div class="left">
+				<p><a href="/property-details/{{listing.ListingId}}">MLS #{{listing.ListingId}}</a></p>
+				{% if hasPhotos %}
+					<img width="150" src="{{listing.listing.photos[0].url}}" class="img-responsive">
+				{% else %}
+					<img width="150" class="img-responsive" src="{{photo.url}}">
+				{% endif %}
+			</div>
+			<div class="right">
+				<p class="address">{{Listings.address(listing)}}</p>
+				<p><b>Offered at ${{listing.ListPrice | number_format(0) }}</b></p
+				>
+				<p><b>Bed/Bath:</b> {{listing.BedroomsTotal}}/{{listing.BathroomsFull}}</p>
+				<p><b>Sq Feet:</b> {{listing.LotSizeSquareFeet | number_format(0) }}</p>
+				{% if listing.YearBuilt %}
+					<p><b>Year Built:</b> {{listing.YearBuilt}}</p>
+				{% endif %}
+			</div>
+		</div>
+		<div class="col-sm-6">
+			<div class="left">
+				<ul>
+					<li>
+						<i class="fa fa-search"></i>
+						<a href="/property-details/{{listing.ListingId}}">View Details</a>
+					</li>
+					<li>
+						<i class="fa fa-pencil"></i>
+						<a href="#0" data-toggle="modal" data-target="#leadModal-{{listing.ListingId}}">Inquire</a>
+					</li>
+				</ul>
+			</div>
+			<div class="right">
+				
+			</div>
+		</div>
+	</div>
+
+	{% if url is not defined and detail_page is defined %}
+		{% set url = detail_page ~ listing.ListingId %}
+	{% endif %}
+
+	{% include "modals/lead.html" with {key: listing.ListingId, url: url} %}
+{% endif %}
