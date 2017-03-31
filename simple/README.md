@@ -25,7 +25,7 @@ You will find two different templates in this directory.
 
 Inside the two previous item templates, you'll find the usage of the import directive for pulling in some handy macro templates.
 
-Macros are a construct which the Twig templating engine provides as a means of creating reusable functions can perform template logics to produce a desired HTML output.
+Macros are a construct which the Twig templating engine provides as a means of creating reusable functions which can perform template logics using Twgi syntax to produce a desired HTML output.
 
 The `errors.html` macro for instance houses two different macros which are responsible for formatting and outputting errors.
 
