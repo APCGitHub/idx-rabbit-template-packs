@@ -9,11 +9,13 @@
 
 	{% if listing is not null %}
 		<span>
-			{{ listings.address(listing) }},
+			{{ listings.address(listing) }}
 
-			{%- if config is defined and config.separated is defined and config.separated %}
+			{%- if config is defined and config.separated is defined and config.separated -%}
 				<br>
-			{% endif -%}
+			{%- else -%}
+				,
+			{%- endif %}
 
 			&nbsp;{% if listing.City %}{{- listing.City -}},&nbsp;{% endif %}{{- listing.StateOrProvince -}}&nbsp;{{- listing.PostalCode -}}
 		</span>
