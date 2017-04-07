@@ -11,38 +11,9 @@
 	<div class="grid-item">
 		<div class="top">
 			{% if hasPhotos %}
-				<div class="swiper-container" id="swiper-{{listing.ListingId}}">
-					<div class="swiper-wrapper">
-						{% for photo in listing.listing.photos %}
-							{% set url = cloudinary(photo.url, {
-								width: 500,
-								height: 350,
-								transform: 'fill'
-							}) %}
-							<div class="swiper-slide">
-								<a href="/property-details/{{listing.ListingId}}">
-									<img class="img-responsive" src="{{url}}">
-								</a>
-							</div>
-						{% endfor %}
-					</div>
-					<div class="swiper-button-prev" id="swiper-prev-{{listing.ListingId}}"></div>
-    				<div class="swiper-button-next" id="swiper-next-{{listing.ListingId}}"></div>
+				<div>
+					<img width="150" src="{{listing.listing.photos[0].url}}" class="img-responsive">
 				</div>
-
-				<script>
-					var mySwiper = new Swiper('#swiper-{{listing.ListingId}}', {
-					    speed: 400,
-					    spaceBetween: 20,
-					    nextButton: '#swiper-next-{{listing.ListingId}}',
-					    prevButton: '#swiper-prev-{{listing.ListingId}}',
-					    autoHeight: true,
-					    loop: true
-					});
-					setTimeout(function () {
-						mySwiper.update(true);
-					}, 500);   
-				</script>
 			{% else %}
 				<img class="img-responsive" src="{{photo.url}}">
 			{% endif %}
