@@ -92,14 +92,8 @@
 						<div class="row" style="margin-top: 20px">
 							<div class="col-sm-12 col-md-10 col-md-offset-1">
 								{% set photo = listing.listing.photos[0] %}
-
-								{% set _url = cloudinary(photo.url, {
-									width: 1000,
-									height: 550,
-									transform: 'fit'
-								}) %}
 								
-								<img src="{{_url}}">
+								<img class="img-responsive" src="{{photo.url}}">
 							</div>
 						</div>
 						{% endif %}
