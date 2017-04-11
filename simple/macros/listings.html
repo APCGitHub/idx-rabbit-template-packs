@@ -1,6 +1,9 @@
 {% macro address(listing) %}
 	{%- if listing is not null %}
-		{{- listing.StreetNumberNumeric -}}&nbsp;{{- listing.StreetName -}}{% if listing.StreetSuffix %}&nbsp;{{- listing.StreetSuffix -}}{% endif -%}
+		{{- listing.StreetNumberNumeric -}}
+		{%- if listing.StreetNumberNumeric %}&nbsp;{% endif -%}
+		{{- listing.StreetName -}}
+		{% if listing.StreetSuffix %}&nbsp;{{- listing.StreetSuffix -}}{% endif -%}
 	{% endif -%}
 {% endmacro %}
 

@@ -1,7 +1,7 @@
 {% import "macros/listings.html" as Listings %}
 {% import "macros/errors.html" as Errors %}
 
-{% set result = listing(listing_id) %}
+{% set result = idxRabbit.api.listing(listing_id) %}
 {% set hasPhotos = false %}
 
 {% set actions = [] %}
@@ -61,26 +61,30 @@
 							<div class="col-sm-4">
 								<div><strong>Bedrooms:</strong> {{ listing.BedroomsTotal }}</div>
 								<div><strong>Full Bathrooms:</strong> {{ listing.BathroomsFull }}</div>
-								<div><strong>Partial Bathrooms:</strong> {{ listing.BathroomsPartial }}</div>
+								{% if Listing.BathroomsPartial %}
+									<div><strong>Partial Bathrooms:</strong> {{ listing.BathroomsPartial }}</div>
+								{% endif %}
 							</div>
 							<div class="col-sm-4">
 								<div><strong>Sq. Feet:</strong> {{ listing.LotSizeSquareFeet | number_format(0) }}</div>
 								<div><strong>Type:</strong> {{ listing.PropertyType }}</div>
 							</div>
 							<div class="col-sm-4">
+								{% if listing.HighSchoolDistrict %}
 								<div><strong>School District:</strong> {{listing.HighSchoolDistrict}}</div>
+								{% endif %}
 								<div><strong>County:</strong> {{listing.CountyOrParish}}</div>
 							</div>
 						</div>
 						<div class="row" style="margin-top:10px">
 							<div class="col-sm-4">
-								{% if not likedListing(listing.ListingId) %}
-									{{ favListingForm({
+								{% if not idxRabbit.api.social.liked(listing.ListingId) %}
+									{{ idxRabbit.forms.favorite({
 										listingId: listing.ListingId
 									}) }}
 										<input type="hidden" name="provider" value="facebook">
 										<button class="btn btn-default" id="favorite-button"><i class="fa fa-star-o"></i>&nbsp;Favorite</button>
-									{{ formClose() }}
+									{{ idxRabbit.forms.close() }}
 
 									<button type="button" id="favorite-success-button" class="btn btn-success hidden" disabled><i class="fa fa-star"></i>&nbsp;Favorited</button>
 								{% else %}
@@ -112,7 +116,7 @@
 					</div>
 					<div class="panel-body">
 						{% if listing.Latitude and listing.Longitude %}
-							<div id="property-detail-map" data-lat="{{listing.Latitude}}" data-lng="{{listing.Longitude}}"></div>
+							<div id="property-detail-map"></div>
 						{% else %}
 							{{Errors.general("No map information available.")}}
 						{% endif %}
@@ -135,78 +139,114 @@
 						<strong>Overview</strong>
 					</div>
 					<div class="panel-body">
+						{% if listing.PropertyType %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Property Type:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.PropertyType}}</div>
 						</div>
+						{% endif %}
+						{% if listing.StandardStatus %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Listing Status:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.StandardStatus}}</div>
 						</div>
+						{% endif %}
+						{% if listing.MLSAreaMajor %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>MLS Major Area:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.MLSAreaMajor}}</div>
 						</div>
+						{% endif %}
+						{% if listing.MLSAreaMinor %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>MLS Minor Area:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.MLSAreaMinor}}</div>
 						</div>
+						{% endif %}
+						{% if listing.SubdivisionName %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Subdivision:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.SubdivisionName}}</div>
 						</div>
+						{% endif %}
+						{% if listing.ArchitecturalStyle %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Style:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.ArchitecturalStyle}}</div>
 						</div>
+						{% endif %}
+						{% if listing.YearBuilt %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Year Built:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.YearBuilt}}</div>
 						</div>
+						{% endif %}
+						{% if listing.ConstructionMaterials %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Construction Materials:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.ConstructionMaterials}}</div>
 						</div>
+						{% endif %}
+						{% if listing.FoundationDetails %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Foundation:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.FoundationDetails}}</div>
 						</div>
+						{% endif %}
+						{% if listing.LotSizeSquareFeet %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Square Feet:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.LotSizeSquareFeet | number_format(0)}}</div>
 						</div>
+						{% endif %}
+						{% if listing.LotSizeArea %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Acres:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.LotSizeArea}}</div>
 						</div>
+						{% endif %}
+						{% if listing.Stories %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Stories:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.Stories}}</div>
 						</div>
+						{% endif %}
+						{% if listing.Roof %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Roofing:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.Roof}}</div>
 						</div>
+						{% endif %}
+						{% if listing.ParkingFeatures %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Garage Description:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.ParkingFeatures}}</div>
 						</div>
+						{% endif %}
+						{% if listing.GarageSpaces %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Garage Spaces:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.GarageSpaces}}</div>
 						</div>
+						{% endif %}
+						{% if listing.Heating %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Heating:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.Heating}}</div>
 						</div>
+						{% endif %}
+						{% if listing.Utilities %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Utilities:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.Utilities}}</div>
 						</div>
+						{% endif %}
+						{% if listing.LotFeatures %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Lot Features:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.LotFeatures}}</div>
 						</div>
+						{% endif %}
 					</div>
 				</div>
 				<div class="panel panel-default">
@@ -214,36 +254,54 @@
 						<strong>Features</strong>
 					</div>
 					<div class="panel-body">
+						{% if listing.ExteriorFeatures %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Exterior Features:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.ExteriorFeatures}}</div>
 						</div>
+						{% endif %}
+						{% if listing.InteriorFeatures %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Interior Features:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.InteriorFeatures}}</div>
 						</div>
+						{% endif %}
+						{% if listing.OtherEquipment %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Other Equipment:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.OtherEquipment}}</div>
 						</div>
+						{% endif %}
+						{% if listing.FireplaceFeatures %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Fireplace Features:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.FireplaceFeatures}}</div>
 						</div>
+						{% endif %}
+						{% if listing.FireplacesTotal %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Fireplaces Total:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.FireplacesTotal}}</div>
 						</div>
+						{% endif %}
+						{% if listing.PoolFeatures %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Pool Features:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.PoolFeatures}}</div>
 						</div>
+						{% endif %}
+						{% if listing.Flooring %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Flooring:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.Flooring}}</div>
 						</div>
+						{% endif %}
 					</div>
 				</div>
+				{#
+				# Leaving this out for the simple template pack
+				#}
+				{#
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<strong>Room Info</strong>
@@ -269,27 +327,36 @@
 						{% endif %}
 					</div>
 				</div>
+				#}
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<strong>Schools</strong>
 					</div>
 					<div class="panel-body">
+						{% if listing.HighSchoolDistrict %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>School District:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.HighSchoolDistrict}}</div>
 						</div>
+						{% endif %}
+						{% if listing.ElementarySchoolDistrict %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Elementary School:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.ElementarySchoolDistrict}}</div>
 						</div>
+						{% endif %}
+						{% if listing.MiddleSchoolDistrict %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>Middle School:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.MiddleSchoolDistrict}}</div>
 						</div>
+						{% endif %}
+						{% if listing.HighSchoolDistrict %}
 						<div class="row">
 							<div class="col-xs-6 col-sm-4 col-md-3"><strong>High School:</strong></div>
 							<div class="col-xs-6 col-sm-8 col-md-9">{{listing.HighSchoolDistrict}}</div>
 						</div>
+						{% endif %}
 					</div>
 				</div>
 				<div class="panel panel-default">
@@ -318,3 +385,30 @@
 
 	{% include "modals/lead.html" with {key: listing.ListingId} %}
 </div>
+
+<script type="text/javascript">
+	var $map = document.getElementById('property-detail-map');
+
+	function initMap() {
+		if($map) {
+			var location = {
+				lat: parseFloat("{{listing.Latitude}}"), 
+				lng: parseFloat("{{listing.Longitude}}")
+			};
+
+	        var map = new google.maps.Map(document.getElementById('property-detail-map'), {
+	          	zoom: 16,
+	          	center: location
+	        });
+
+	        var marker = new google.maps.Marker({
+	          position: location,
+	          map: map
+	        });
+		}
+	}
+</script>
+
+<script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=API_KEY-e2Y&callback=initMap">
+    </script>

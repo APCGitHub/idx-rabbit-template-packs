@@ -1,0 +1,12 @@
+{% import "macros/errors.html" as Error %}
+
+{% set results = idxRabbit.api.listings({
+	'$top': 12,
+	'$orderby': 'ListPrice desc',
+}) %}
+
+{% if results['errors'] is defined %}
+	{{Error.api(results)}}
+{% else %}
+	{% include "layouts/grid.html" with {listings: results.data } %}
+{% endif %}

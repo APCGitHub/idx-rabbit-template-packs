@@ -9,21 +9,23 @@
 	{% endif %}
 
 	<div class="grid-item">
-		<div class="top">
-			{% if hasPhotos %}
-				<div>
-					<img width="150" src="{{listing.listing.photos[0].url}}" class="img-responsive">
+		<a href="/property-details/{{listing.ListingId}}">
+			<div class="top">
+				{% if hasPhotos %}
+					<div>
+						<img src="{{listing.listing.photos[0].url}}" class="img-responsive">
+					</div>
+				{% else %}
+					<img class="img-responsive" src="{{photo.url}}">
+				{% endif %}
+				<div class="listing-data">
+					<span class="price">${{ listing.ListPrice | number_format(0) }}</span>
+					<span>{{listing.BedroomsTotal}} Beds / {{listing.BathroomsFull}} Baths</span>
 				</div>
-			{% else %}
-				<img class="img-responsive" src="{{photo.url}}">
-			{% endif %}
-			<div class="listing-data">
-				<span class="price">${{ listing.ListPrice | number_format(0) }}</span>
-				<span>{{listing.BedroomsTotal}} Beds / {{listing.BathroomsFull}} Baths</span>
 			</div>
-		</div>
-		<div class="bottom">
-			<p>{{Listings.fullAddress(listing, {separated: true})}}</p>
-		</div>
+			<div class="bottom">
+				<p>{{Listings.fullAddress(listing, {separated: true})}}</p>
+			</div>
+		</a>
 	</div>
 {% endif %}

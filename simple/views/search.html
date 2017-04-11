@@ -111,24 +111,6 @@
 
 {% set amenities = amenities|sort %}
 
-<style>
-	h4 {
-		margin: 0 !important;
-	}
-
-	input[type=checkbox] {
-		-webkit-appearance: checkbox;
-		-moz-appearance: checkbox;
-		appearance: checkbox;
-	}
-
-	select {
-		-webkit-appearance: menulist !important;
-		-moz-appearance: menulist !important;
-		appearance: menulist !important;
-	}
-</style>
-
 <div class="container">
 	<div class="row" style="margin-top:30px">
 		<div class="col-sm-12 col-md-10 col-md-offset-1">
@@ -137,7 +119,7 @@
 					<h4>Standard Search</h4>
 				</div>
 				<div class="panel-body">
-					{{ searchForm({
+					{{ idxRabbit.forms.search({
 						id: 'standard-search',
 						class: 'form-horizontal col-sm-12 col-md-10 col-md-offset-1',
 						redirect: redirect
@@ -411,7 +393,7 @@
 						<div class="form-group text-center" style="margin-top: 15px">
 							<button class="btn btn-success">Search Results</button>
 						</div>
-					{{ formClose() }}
+					{{ idxRabbit.forms.close() }}
 				</div>
 			</div>
 		</div>

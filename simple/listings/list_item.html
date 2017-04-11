@@ -13,7 +13,8 @@
 			<div class="left">
 				<p><a href="/property-details/{{listing.ListingId}}">MLS #{{listing.ListingId}}</a></p>
 				{% if hasPhotos %}
-					<img width="150" src="{{listing.listing.photos[0].url}}" class="img-responsive">
+					{% set photo = listing.listing.photos[0].url %}
+					<img width="150" src="{{photo}}" class="img-responsive">
 				{% else %}
 					<img width="150" class="img-responsive" src="{{photo.url}}">
 				{% endif %}

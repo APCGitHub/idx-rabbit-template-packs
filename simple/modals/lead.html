@@ -21,13 +21,13 @@
 			<div class="modal-body">
 				<div class="row">
 					<div class="col-sm-7 col-lg-8 left">
-						{{ leadForm({
+						{{ idxRabbit.forms.lead({
 							id: 'lead-form-' ~ key,
 							class: 'form-horizontal',
 							listingId: listing.ListingId,
 							listingUrl: url
 						}) }}
-							{% set prospect = getProspect() %}
+							{% set prospect = idxRabbit.api.social.prospect() %}
 							{% if prospect %}
 								{% set prospect = prospect['data']['prospect'] %}
 							{% endif %}
@@ -66,16 +66,16 @@
 							<div class="form-group text-center">
 								<button class="btn btn-success">Submit Inquiry</button>
 							</div>
-						{{ formClose() }}
+						{{ idxRabbit.forms.close() }}
 					</div>
 					<div class="col-sm-5 col-lg-4 right">
 						<div class="row">
 							<div class="col-sm-12">
-								<div><b>For additional information, contact Anne Lakusta</b></div>
-								<div><b>Keller Williams Dallas Metro North</b></div>
-								<div>2611 Cross Timbers</div>
-								<div>Flower Mound, TX 75028</div>
-								<div><b>Phone:</b> (972) 874-1905</div>
+								<div><b>For additional information, contact First Last</b></div>
+								<div><b>My Company</b></div>
+								<div>123 Road Rd.</div>
+								<div>City, Az 43081</div>
+								<div><b>Phone:</b> (123) 456-7891</div>
 							</div>
 						</div>
 						<hr>
