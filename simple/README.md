@@ -1,8 +1,8 @@
 # The Simple IDX Rabbit Template Pack
 
-This template works best with the Bootstrap framework as it already uses classes that exist within that framework, but these templates can be easily modified to work with any CSS framework.
+This template works best with the [Bootstrap framework](http://getbootstrap.com/) as it already uses classes that exist within that framework, but these templates can be easily modified to work with any CSS framework.
 
-Small pieces of jQuery are also used to enhance template functionality, but that code can easily be converted over to vanilla JS or removed.
+Small pieces of [jQuery](https://jquery.com/) are also used to enhance template functionality, but that code can easily be converted over to vanilla JS or removed.
 
 ## Structure
 
